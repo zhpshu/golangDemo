@@ -1,0 +1,35 @@
+package main
+
+import (
+    "fmt"
+    "sync"
+    "time"
+)
+
+func worker(id int, wg *sync.WaitGroup) {
+    defer wg.Done() // 确保在goroutine结束时调用Done()
+    fmt.Printf("Worker %d is starting\n", id)
+    time.Sleep(time.Second) // 模拟工作
+    fmt.Printf("Worker %d is done\n", id)
+}
+
+func main() {
+    var wg sync.WaitGroup // 创建WaitGroup实例
+    for i := 1; i <= 3; i++ {
+        wg.Add(1) // 增加计数器的值
+        go worker(i, &wg) // 启动goroutine并传递WaitGroup指针
+    }
+    wg.Wait() // 等待所有goroutine完成
+    fmt.Println("All workers are done") // 所有goroutine完成后执行
+}
+//在这个例子中，我们启动了三个工作goroutine，每个goroutine完成时调用Done()方法减少计数器的值。主goroutine通过调用Wait()方法等待所有工作goroutine完成后再继续执行。
+
+/*
+‌WaitGroup是Go语言标准库sync包中的一个并发同步工具，用于协调主goroutine与多个工作goroutine的执行。‌
+
+WaitGroup的基本用法
+‌创建WaitGroup实例‌：在主goroutine中创建一个WaitGroup实例。
+‌增加计数器‌：在每个工作goroutine开始执行前，调用Add(1)方法增加计数器的值。
+‌减少计数器‌：在工作goroutine完成时，调用Done()方法减少计数器的值。
+‌等待所有goroutine完成‌：在主goroutine中调用Wait()方法，阻塞当前goroutine，直到所有工作goroutine完成（即计数器归零）。
+*/
