@@ -53,10 +53,23 @@ func main() {
 	inc(&p)
 	fmt.Println(p)
 
-	b := 255
-	var a *int = &b
-	fmt.Printf("Type of a is %T\n", a)
-	fmt.Println("address of b is", a)
+    1.对变量进行取地址（&）操作，可以获得这个变量的指针变量。
+    2.指针变量的值是指针地址。
+    3.对指针变量进行取值（*）操作，可以获得指针变量指向的原变量的值。
+    4.总结： 取地址操作符&和取值操作符*是一对互补操作符，&取出地址，*根据地址取出地址指向的值
+    //指针取值
+    a := 10
+    var b * int
+    b = &a // 取变量a的地址，将指针保存到b中,b的类型是指针类型
+    fmt.Printf("type of b:%T\n", b)
+    c := *b // 指针取值（根据指针去内存取值）
+    fmt.Printf("type of c:%T\n", c)
+    fmt.Printf("value of c:%v\n", c)
+    /*
+    type of b:*int
+    type of c:int
+    value of c:10
+    */
 }
 func sum(x int, y int) int {
 	return x + y
