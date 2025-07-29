@@ -66,3 +66,13 @@ exceptionFun开始执行
 开始处理异常
 error: 抛出异常信息
 结束异常处理
+
+另外，新开的协程的话，一定要抓一下异常，避免silently crashed
+go func() {
+	defer func() {
+		if r := recover(); r != nil {
+			slog.Error("[infinity] init panic", "err", r, "stack", str.Bytes2String(debug.Stack()))
+		}
+	}()
+	scheduler.NewScheduler("xxxx"）
+}
