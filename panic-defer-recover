@@ -76,3 +76,31 @@ go func() {
 	}()
 	scheduler.NewScheduler("xxxx"）
 }
+
+
+
+//defer（延迟执行）
+
+Go 语言中 defer 的含义与作用
+defer 是 Go 语言中一个非常关键的关键字，它的核心含义是：延迟执行。具体来说，defer 修饰的函数调用会在包含它的函数即将返回前执行，无论该函数是正常返回还是因 panic 而提前退出。
+执行时机
+defer 语句在函数体执行完毕后、返回结果前自动执行
+执行顺序：后进先出（LIFO），即最后声明的 defer 最先执行
+
+举例说明
+func GoodMd5File(path string) (string, error) {
+    file, err := os.Open(path)
+    if err != nil {
+        return "", err
+    }
+    defer file.Close() // ✅ 无论后续发生什么，都会执行
+    
+    hash := md5.New()
+    _, err = io.Copy(hash, file)
+    if err != nil {
+        return "", err // 此时 file.Close() 仍会被调用
+    }
+    return hex.EncodeToString(hash.Sum(nil)), nil
+}
+
+
