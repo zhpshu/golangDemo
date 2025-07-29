@@ -1,0 +1,68 @@
+用Go语言异常机制模拟TryCatch异常捕捉
+有的同学看到Go和TryCatch一起出现，心里可能会说，难道Go语言升级了，加入了try...catch语句。哈哈，其实Go语言从创建之初就没打算加入try...catch语句，因为创建Go的那帮大爷认为try...catch挺烦人的，如果滥用，会造成程序混乱，所以就不打算加入try...catch（以后加不加入不好说）。
+既然Go语言中并没有try...catch语句，那么为何文章标题说要使用TryCatch呢？其实Go语言中只是没有try...catch语句，并不是没有异常处理机制。Go语言中的异常处理机制就是著名的异常三剑客：panic、defer和recover。通过这3个家伙，是完全可以模拟出try...catch语句效果的，对了，后面还应该有个finally。在正式模拟try...catch语句之前，先来回顾下Go语言中的异常处理机制是如何玩的。
+
+Go语言中的异常处理机制
+在前面提到，Go语言通过panic、defer和recover来处理异常的，那么这3个东西是什么呢？
+
+
+不管是什么异常处理机制，核心的原理都是一样的，通常来讲，一个完善的异常处理机制需要由下面3部分组成。
+
+1. 抛出异常
+2. 处理异常的代码段
+3.获取异常信息
+
+下面先用Java的异常处理机制来说明这一点。下面的代码是标准的Java异常处理机制，try部分的throw用于抛出异常，而catch部分的代码段用于处理特定的异常，通过catch子句的参数e可以获取异常信息。所以对于Java来说，上述的3个异常重要的组成部分都有。
+import java.io.IOException;
+ public class Main {
+    public static void main(String[] args) {
+        try
+        {
+            boolean ioException = false;
+            if (ioException) {
+                throw new IOException("ioexception");
+            } else {
+                throw new Exception("exception");
+            }
+        }catch (IOException e) {
+            System.err.println(e);
+        }catch (Exception e) {
+            System.out.println(e);
+        }finally{
+            System.out.println("finally");
+        }
+    }
+}
+对于Go语言来说，panic、defer和recover也分别对应了这3部分。其中panic是一个函数，用于抛出异常，相当于Java中的throw函数。defer是一个关键字，用于修饰函数，用defer修饰的函数，在抛出异常时会自动调用。
+recover是一个函数，用于获取异常信息，通常在用defer修饰的函数中使用。
+下面是一段用Go语言处理异常的代码。
+
+package main
+
+import "fmt"
+
+func main() {
+	//  处理异常的函数
+	defer func() {
+		fmt.Println("开始处理异常")
+		// 获取异常信息
+		if err := recover(); err != nil {
+			//  输出异常信息
+			fmt.Println("error:", err)
+		}
+		fmt.Println("结束异常处理")
+	}()
+	exceptionFun()
+}
+
+func exceptionFun() {
+	fmt.Println("exceptionFun开始执行")
+	panic("抛出异常信息")
+	fmt.Println("exceptionFun执行结束")
+}
+
+//输出结果
+exceptionFun开始执行
+开始处理异常
+error: 抛出异常信息
+结束异常处理
